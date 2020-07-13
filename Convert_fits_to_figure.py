@@ -6,16 +6,20 @@ import matplotlib.pyplot as plt
 import sys
 import glob
 from tqdm import tqdm
-args =sys.argv
-source_path_str = args[1]
-source_paths = glob.glob(source_path_str)
-export_dir = args[2]
-for path in tqdm(source_paths):
+from joblib import Parallel,delayed
+def convert_fits(path,export_dir):
     ar_num = path.split(".")[2]
     rec_time =path.split(".")[3]
-    filename = export_dir+"/"+"mag_"+str(ar_num)+"_"+str(rec_time[0:15])+".png"
+    filename = "mag_figs/mag_"+str(ar_num)+"_"+str(rec_time[0:15])+".png"
     map = sunpy.map.Map(path)
     plt.figure(1)
     plt.imshow(map.data)
     plt.figure(1).savefig(filename)
     plt.axis("off")
+def main():
+    args =sys.argv
+    source_path_str = args[1]
+    source_paths = glob.glob(source_path_str)
+    export_dir = args[2]
+    Parallel(n_jobs=-1)([convert_fits(path,export_dir) for path in tqdm(source_paths)])
+main()
